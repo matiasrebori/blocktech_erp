@@ -1,0 +1,141 @@
+{% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle Proyecto</title>
+
+    {% bootstrap_css %}
+</head>
+<body>
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ proyecto.nombre }}</h2>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">← Volver</a>
+    </div>
+
+    <!-- INFO GENERAL -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <p><strong>Cliente:</strong> {{ proyecto.cliente }}</p>
+            <p><strong>Estado:</strong> {{ proyecto.estado }}</p>
+            <p><strong>Fecha inicio:</strong> {{ proyecto.fecha_inicio }}</p>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Ingresos</h6>
+                    <h4>Gs {{ proyecto.total_ingresos|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Costos</h6>
+                    <h4>Gs {{ proyecto.total_costos|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Profit</h6>
+
+                    {% if proyecto.profit >= 0 %}
+                        <h4 class="text-success">
+                            Gs {{ proyecto.profit|floatformat:0 }}
+                        </h4>
+                    {% else %}
+                        <h4 class="text-danger">
+                            Gs {{ proyecto.profit|floatformat:0 }}
+                        </h4>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- INGRESOS -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5>Pagos (Ingresos)</h5>
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in pagos %}
+                    <tr>
+                        <td>{{ pago.fecha }}</td>
+                        <td>{{ pago.tipo }}</td>
+                        <td>Gs {{ pago.monto|floatformat:0 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">Sin pagos</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- COSTOS -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5>Compras (Costos)</h5>
+
+            {% for compra in compras %}
+                <div class="mb-3 border p-2 rounded">
+                    <strong>{{ compra.proveedor }}</strong> - {{ compra.fecha }}
+
+                    <table class="table table-sm mt-2">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in compra.detalles.all %}
+                            <tr>
+                                <td>{{ d.producto }}</td>
+                                <td>{{ d.cantidad }}</td>
+                                <td>{{ d.precio_unitario }}</td>
+                                <td>{{ d.subtotal }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% empty %}
+                <p>Sin compras</p>
+            {% endfor %}
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
